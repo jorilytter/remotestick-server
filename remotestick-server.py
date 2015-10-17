@@ -15,8 +15,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-# 
-# 
+#
+#
 
 from bottle import route, run, response, request, static_file
 from ctypes import util
@@ -26,8 +26,8 @@ from sys import argv, exit, platform
 from base64 import b64encode
 import time
 
-VERSION = "0.4.1"
-API_VERSION = 1
+VERSION = "0.5.0"
+API_VERSION = 2
 
 #Device methods
 TELLSTICK_TURNON = 1
@@ -47,24 +47,16 @@ disable_static=False
 
 def loadlibrary(libraryname=None):
     if libraryname == None:
-        if platform == "darwin" or platform == "win32":
-            libraryname = "TelldusCore"
-        elif platform == "linux2":
-            libraryname = "telldus-core"
-        else:
-            libraryname = "TelldusCore"
+        libraryname = "telldus-core"
         ret = util.find_library(libraryname)
     else:
         ret = libraryname
-    
+
     if ret == None:
         return (None, libraryname)
 
     global libtelldus
-    if platform == "win32":
-        libtelldus = windll.LoadLibrary(ret)
-    else:
-        libtelldus = cdll.LoadLibrary(ret)
+    libtelldus = cdll.LoadLibrary(ret)
     libtelldus.tdGetName.restype = c_char_p
     libtelldus.tdLastSentValue.restype = c_char_p
     libtelldus.tdGetProtocol.restype = c_char_p
@@ -86,22 +78,16 @@ def errmsg(x):
         220: "Method not supported",
         300: "Telldus-core error"
     }[x]
-   
-def err(format, responsecode, request, code, code_msg=None):
+
+def err(responsecode, request, code, code_msg=None):
     response.status = responsecode
     if responsecode == 401:
         response.headers.append("WWW-Authenticate", "Basic realm=\"RemoteStick\"")
 
     if code_msg == None:
         code_msg = errmsg(code)
-    
-    if format == "xml":
-        return err_xml(request, code_msg)
-    else:
-        return err_xml(request, code_msg)
 
-def err_xml(request, msg):
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n\t<request>" + request + "</request>\n\t<error>" + msg + "</error>\n</hash>"
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n\t<request>" + request + "</request>\n\t<error>" + code_msg + "</error>\n</hash>"
 
 def authenticate(auth):
     global username, password
@@ -122,7 +108,7 @@ def read_device(identity):
     lastValue = libtelldus.tdLastSentValue(identity)
     element = "<device id=\"" + str(identity) + "\">\n\t\t<name>" + name + "</name>\n\t\t<protocol>" + protocol + "</protocol>\n\t\t<model>" + model + "</model>\n"
     if lastcmd == 1:
-        element += "\t\t<lastcmd>ON</lastcmd>\n"        
+        element += "\t\t<lastcmd>ON</lastcmd>\n"
     else:
         element += "\t\t<lastcmd>OFF</lastcmd>\n"
     if lastValue != None and lastValue != "":
@@ -131,7 +117,7 @@ def read_device(identity):
             element += "\t\t<lastvalue>" + str(lastValueConverted) + "</lastvalue>\n"
         except Exception, e:
             pass
-    
+
     if methods & TELLSTICK_BELL:
         element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_BELL) + "\">" + "TELLSTICK_BELL</supportedMethod>\n"
     if methods & TELLSTICK_TOGGLE:
@@ -147,25 +133,19 @@ def read_device(identity):
     element += "</device>\n"
     return element
 
-def pre_check(format, accepted_formats):
-    if format not in accepted_formats:
-        return False, 400, 101
+def pre_check():
     if not authenticate(request.auth):
         return False, 401, 100
     return True, None, None
 
-def set_headers(format):
-    if format == "xml":
-        response.set_content_type('text/xml; charset=utf8')
+def set_headers():
+    response.set_content_type('text/xml; charset=utf8')
     response.headers.append("X-API-VERSION", str(API_VERSION))
     response.headers.append("X-VERSION", VERSION)
 
-@route('/devices.:format', method='GET')
-def devices(format):
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, 'GET /devices.' + format, error_code)
-    set_headers(format)
+@route('/devices', method='GET')
+def devices():
+    set_headers()
     result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<devices>\n"
     numDevices = libtelldus.tdGetNumberOfDevices()
     for i in range(numDevices):
@@ -173,33 +153,30 @@ def devices(format):
     result += "</devices>"
     return result
 
-@route('/devices.:format', method='POST')
-def new_device(format):
-    request_str = 'POST /devices.' + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
-    
+@route('/devices', method='POST')
+def new_device():
+    request_str = 'POST /devices'
+    set_headers()
+
     name = request.POST.get('name', '').strip()
     if not name:
-        return err(format, 400, request_str, 201)
+        return err(400, request_str, 201)
 
     model = request.POST.get('model', '')
     if not model:
-        return err(format, 400, request_str, 202)
+        return err(400, request_str, 202)
 
     protocol = request.POST.get('protocol', '')
     if not protocol:
-        return err(format, 400, request_str, 203)
-        
+        return err(400, request_str, 203)
+
     rawParams = request.POST.get('parameters', '')
     parameters = []
     if rawParams != None:
         for param in rawParams.split():
             keyval = param.split('=')
             if len(keyval) != 2:
-                return err(format, 400, request_str, 210)
+                return err(400, request_str, 210)
             else:
                 parameters.append(keyval)
     identity = libtelldus.tdAddDevice()
@@ -212,158 +189,137 @@ def new_device(format):
     retval += read_device(identity)
     return retval
 
-@route('/devices/:id.:format', method='GET')
-def get_device(id, format):
-    request_str = 'GET /devices/' + id + "." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
+@route('/devices/:id', method='GET')
+def get_device(id):
+    request_str = 'GET /devices/' + id
+    set_headers()
 
     retval = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
     try:
         retval += read_device(int(id))
         return retval
     except ValueError:
-        return err(format, 400, request_str, 210)
+        return err(400, request_str, 210)
 
 
-@route('/devices/:id.:format', method='DELETE')
-def delete_device(id, format):
-    request_str = 'DELETE /devices/' + id + "." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
+@route('/devices/:id', method='DELETE')
+def delete_device(id):
+    request_str = 'DELETE /devices/' + id
+    set_headers()
 
     try:
         retval = libtelldus.tdRemoveDevice(int(id))
     except ValueError:
-        return err(format, 400, request_str, 210)
+        return err(400, request_str, 210)
 
     if retval == 1:
         return ""
     else:
-        return err(format, 400, request_str, 211)
+        return err(400, request_str, 211)
 
-@route('/devices/:id.:format', method='PUT')
-def change_device(id, format):
-    request_str = 'PUT /devices/' + id + "." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
+@route('/devices/:id', method='PUT')
+def change_device(id):
+    request_str = 'PUT /devices/' + id
+    set_headers()
 
     name = request.POST.get('name', '').strip()
     protocol = request.POST.get('protocol', '').strip()
     model = request.POST.get('model', '').strip()
     if name:
         libtelldus.tdSetName(int(id), name)
-    
+
     if model:
         libtelldus.tdSetModel(int(id), model)
-    
+
     if protocol:
         libtelldus.tdSetProtocol(int(id), protocol)
-          
+
     retval = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
     try:
         retval += read_device(int(id))
         return retval
     except ValueError:
-        return err(format, 400, request_str, 210)
+        return err(400, request_str, 210)
     return ""
 
-@route('/devices/:id/on.:format', method='GET')
-def turnon_device(id, format):
-    request_str = 'GET /devices/' + id + "/on." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
-    
+@route('/devices/:id/on', method='GET')
+def turnon_device(id):
+    request_str = 'GET /devices/' + id + "/on"
+    set_headers()
+
     try:
         identity = int(id)
     except ValueError:
-        return err(format, 400, request_str, 210)
-    
-    if libtelldus.tdMethods(identity, TELLSTICK_TURNON) & TELLSTICK_TURNON:    
+        return err(400, request_str, 210)
+
+    if libtelldus.tdMethods(identity, TELLSTICK_TURNON) & TELLSTICK_TURNON:
         retval = libtelldus.tdTurnOn(identity)
         if retval == 0:
             return ""
         else:
-            return err(format, 502, request_str, 300, libtelldus.tdGetErrorString(retval))
+            return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
-        return err(format, 400, request_str, 220)
+        return err(400, request_str, 220)
 
-@route('/devices/:id/off.:format', method='GET')
-def turnoff_device(id, format):
-    request_str = 'GET /devices/' + id + "/off." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
+@route('/devices/:id/off', method='GET')
+def turnoff_device(id):
+    request_str = 'GET /devices/' + id + "/off"
+    set_headers()
 
     try:
         identity = int(id)
     except ValueError:
-        return err(format, 400, request_str, 210)
-    
-    if libtelldus.tdMethods(identity, TELLSTICK_TURNOFF) & TELLSTICK_TURNOFF:    
+        return err(400, request_str, 210)
+
+    if libtelldus.tdMethods(identity, TELLSTICK_TURNOFF) & TELLSTICK_TURNOFF:
         retval = libtelldus.tdTurnOff(identity)
         if retval == 0:
             return ""
         else:
-            return err(format, 502, request_str, 300, libtelldus.tdGetErrorString(retval))
+            return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
-        return err(format, 400, request_str, 220)
+        return err(400, request_str, 220)
 
-@route('/devices/:id/dim/:level.:format', method='GET')
-def dim_device(id, level, format):
-    request_str = 'GET /devices/' + id + "/dim/" + level + "." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
+@route('/devices/:id/dim/:level', method='GET')
+def dim_device(id, level):
+    request_str = 'GET /devices/' + id + "/dim/" + level
+    set_headers()
 
     try:
         identity = int(id)
         dimlevel = int(level)
 #        dimlevel = int(round(int(level)*2.55))
     except ValueError:
-        return err(format, 400, request_str, 210)
+        return err(400, request_str, 210)
 
-    if libtelldus.tdMethods(identity, TELLSTICK_DIM) & TELLSTICK_DIM:    
+    if libtelldus.tdMethods(identity, TELLSTICK_DIM) & TELLSTICK_DIM:
         retval = libtelldus.tdDim(identity, dimlevel)
         if retval == 0:
             return ""
         else:
-            return err(format, 502, request_str, 300, libtelldus.tdGetErrorString(retval))
+            return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
-        return err(format, 400, request_str, 220)
-    
-@route('/devices/:id/learn.:format', method='GET')
-def learn_device(id, format):
-    request_str = 'GET /devices/' + id + "/learn." + format
-    ok, response_code, error_code = pre_check(format, ["xml"])
-    if not ok:
-        return err(format, response_code, request_str, error_code)
-    set_headers(format)
+        return err(400, request_str, 220)
+
+@route('/devices/:id/learn', method='GET')
+def learn_device(id):
+    request_str = 'GET /devices/' + id + "/learn"
+    set_headers()
 
     try:
         identity = int(id)
     except ValueError:
-        return err(format, 400, request_str, 210)
-    
-    if libtelldus.tdMethods(identity, TELLSTICK_LEARN) & TELLSTICK_LEARN:    
+        return err(400, request_str, 210)
+
+    if libtelldus.tdMethods(identity, TELLSTICK_LEARN) & TELLSTICK_LEARN:
         retval = libtelldus.tdLearn(identity)
         if retval == 0:
             return ""
         else:
-            return err(format, 502, request_str, 300, libtelldus.tdGetErrorString(retval))
+            return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
-        return err(format, 400, request_str, 220)
-        
+        return err(400, request_str, 220)
+
 @route('/s', method='GET')
 @route('/s/', method='GET')
 def static_default():
@@ -377,7 +333,7 @@ def static(file):
     global disable_static
     global static_folder
     if not disable_static:
-        return static_file(file, root=static_folder) 
+        return static_file(file, root=static_folder)
 
 def usage():
     print "Usage: remotestick-server [OPTION] ..."
@@ -415,7 +371,7 @@ def main():
     global reqauth
     global static
     global disable_static
-    
+
     for o, a in opts:
         if o in ("-h", "--host"):
             host = a
@@ -439,16 +395,16 @@ def main():
             exit()
         else:
             assert False, "unhandled option " + o
-    
+
     lib, libname = loadlibrary(library)
     if lib == None:
         print "Error: Cannot find library " + libname
         exit(3)
-        
+
     if username == None or password == None:
         print "Warning: No authentication required. Please consider setting --username and --password."
         reqauth = False
-        
+
     if (host == None and port == None):
         run(host="0.0.0.0", port="8422")
     elif host != None and port == None:
@@ -457,6 +413,6 @@ def main():
         run(host="0.0.0.0", port=port)
     else:
         run(host=host, port=port)
-             
+
 if __name__ == "__main__":
     main()
