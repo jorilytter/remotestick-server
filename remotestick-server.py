@@ -406,14 +406,13 @@ def main():
         print "Warning: No authentication required. Please consider setting --username and --password."
         reqauth = False
 
-    if (host == None and port == None):
-        run(host="0.0.0.0", port="8422")
-    elif host != None and port == None:
-        run(host=host, port="8422")
-    elif host == None and port != None:
-        run(host="0.0.0.0", port=port)
-    else:
-        run(host=host, port=port)
+    if (host == None):
+        host = "0.0.0.0"
+
+    if (port == None):
+        port = "8422"
+
+    run(host=host, port=port)
 
 if __name__ == "__main__":
     main()
