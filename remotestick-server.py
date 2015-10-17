@@ -153,11 +153,11 @@ def set_headers():
 @route('/devices', method='GET')
 def devices():
     set_headers()
-    result = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<devices>\n"
+    result = "{'devices': ["
     numDevices = libtelldus.tdGetNumberOfDevices()
     for i in range(numDevices):
         result += read_device(libtelldus.tdGetDeviceId(i))
-    result += "</devices>"
+    result += "]}"
     return result
 
 @route('/devices', method='POST')
@@ -192,8 +192,7 @@ def new_device():
     libtelldus.tdSetModel(identity, model.strip())
     for param in parameters:
         libtelldus.tdSetDeviceParameter(identity, param[0], param[1])
-    retval = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-    retval += read_device(identity)
+    retval = read_device(identity)
     return retval
 
 @route('/devices/:id', method='GET')
@@ -201,9 +200,8 @@ def get_device(id):
     request_str = 'GET /devices/' + id
     set_headers()
 
-    retval = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
     try:
-        retval += read_device(int(id))
+        retval = read_device(int(id))
         return retval
     except ValueError:
         return err(400, request_str, 210)
@@ -220,7 +218,7 @@ def delete_device(id):
         return err(400, request_str, 210)
 
     if retval == 1:
-        return ""
+        return "{'status': 'OK'}"
     else:
         return err(400, request_str, 211)
 
@@ -241,9 +239,8 @@ def change_device(id):
     if protocol:
         libtelldus.tdSetProtocol(int(id), protocol)
 
-    retval = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
     try:
-        retval += read_device(int(id))
+        retval = read_device(int(id))
         return retval
     except ValueError:
         return err(400, request_str, 210)
@@ -262,7 +259,7 @@ def turnon_device(id):
     if libtelldus.tdMethods(identity, TELLSTICK_TURNON) & TELLSTICK_TURNON:
         retval = libtelldus.tdTurnOn(identity)
         if retval == 0:
-            return ""
+            return "{'status': 'OK'}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
@@ -281,7 +278,7 @@ def turnoff_device(id):
     if libtelldus.tdMethods(identity, TELLSTICK_TURNOFF) & TELLSTICK_TURNOFF:
         retval = libtelldus.tdTurnOff(identity)
         if retval == 0:
-            return ""
+            return "{'status': 'OK'}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
@@ -302,7 +299,7 @@ def dim_device(id, level):
     if libtelldus.tdMethods(identity, TELLSTICK_DIM) & TELLSTICK_DIM:
         retval = libtelldus.tdDim(identity, dimlevel)
         if retval == 0:
-            return ""
+            return "{'status': 'OK'}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
@@ -321,7 +318,7 @@ def learn_device(id):
     if libtelldus.tdMethods(identity, TELLSTICK_LEARN) & TELLSTICK_LEARN:
         retval = libtelldus.tdLearn(identity)
         if retval == 0:
-            return ""
+            return "{'status': 'OK'}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
