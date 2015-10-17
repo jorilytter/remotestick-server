@@ -88,7 +88,7 @@ def err(responsecode, request, code, code_msg=None):
     if code_msg == None:
         code_msg = errmsg(code)
 
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<hash>\n\t<request>" + request + "</request>\n\t<error>" + code_msg + "</error>\n</hash>"
+    return "{'request': '" + request + "', 'error': '" + code_msg + "'}"
 
 def authenticate(auth):
     global username, password
@@ -107,31 +107,37 @@ def read_device(identity):
     model = libtelldus.tdGetModel(identity)
     methods = libtelldus.tdMethods(identity, ALL_METHODS)
     lastValue = libtelldus.tdLastSentValue(identity)
-    element = "<device id=\"" + str(identity) + "\">\n\t\t<name>" + name + "</name>\n\t\t<protocol>" + protocol + "</protocol>\n\t\t<model>" + model + "</model>\n"
+
+    element = """{'device':
+            {'id': '""" + str(identity) + """'},
+            {'name': '""" + name + """'},
+            {'protocol': '""" + protocol + """'},
+            {'model': ''""" + model + """'},"""
+
     if lastcmd == 1:
-        element += "\t\t<lastcmd>ON</lastcmd>\n"
+        element += "{'lastcmd': 'ON'},"
     else:
-        element += "\t\t<lastcmd>OFF</lastcmd>\n"
+        element += "{'lastcmd': 'OFF'}"
     if lastValue != None and lastValue != "":
         try:
             lastValueConverted = int(lastValue)
-            element += "\t\t<lastvalue>" + str(lastValueConverted) + "</lastvalue>\n"
+            element += ",{'lastvalue': '" + str(lastValueConverted) + "'}"
         except Exception, e:
             pass
 
     if methods & TELLSTICK_BELL:
-        element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_BELL) + "\">" + "TELLSTICK_BELL</supportedMethod>\n"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_BELL) + "', 'name': 'TELLSTICK_BELL'}"
     if methods & TELLSTICK_TOGGLE:
-        element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_TOGGLE) + "\">" + "TELLSTICK_TOGGLE</supportedMethod>\n"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TOGGLE) + "', 'name': 'TELLSTICK_TOGGLE'}"
     if methods & TELLSTICK_TURNOFF:
-        element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_TURNOFF) + "\">" + "TELLSTICK_TURNOFF</supportedMethod>\n"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNOFF) "', 'name': 'TELLSTICK_TURNOFF'}"
     if methods & TELLSTICK_TURNON:
-        element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_TURNON) + "\">" + "TELLSTICK_TURNON</supportedMethod>\n"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNON) + "', 'name': 'TELLSTICK_TURNON'}"
     if methods & TELLSTICK_DIM:
-        element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_DIM) + "\">" + "TELLSTICK_DIM</supportedMethod>\n"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_DIM) + "', 'name': 'TELLSTICK_DIM'}"
     if methods & TELLSTICK_LEARN:
-        element += "\t\t<supportedMethod id=\"" + str(TELLSTICK_LEARN) + "\">" + "TELLSTICK_LEARN</supportedMethod>\n"
-    element += "</device>\n"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_LEARN) + "', 'name': 'TELLSTICK_LEARN'}"
+    element += "}"
     return element
 
 def pre_check():
@@ -140,7 +146,7 @@ def pre_check():
     return True, None, None
 
 def set_headers():
-    response.set_content_type('text/xml; charset=utf8')
+    response.set_content_type('application/json; charset=utf8')
     response.headers.append("X-API-VERSION", str(API_VERSION))
     response.headers.append("X-VERSION", VERSION)
 
