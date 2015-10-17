@@ -321,15 +321,15 @@ def learn_device(id):
     else:
         return err(400, request_str, 220)
 
-@route('/s', method='GET')
-@route('/s/', method='GET')
+@route('/', method='GET')
+@route('', method='GET')
 def static_default():
     global disable_static
     global static_folder
     if not disable_static:
         return static_file('index.html', root=static_folder)
 
-@route('/s/:file#.*[^/]#', method='GET')
+@route('/:file#.*[^/]#', method='GET')
 def static(file):
     global disable_static
     global static_folder
