@@ -44,7 +44,6 @@ username = None
 password = None
 libtelldus = None
 static_folder = "./static/"
-disable_static=False
 
 def loadlibrary(libraryname=None):
     if libraryname == None:
@@ -332,17 +331,13 @@ def learn_device(id):
 @route('/', method='GET')
 @route('', method='GET')
 def static_default():
-    global disable_static
     global static_folder
-    if not disable_static:
-        return static_file('index.html', root=static_folder)
+    return static_file('index.html', root=static_folder)
 
 @route('/:file#.*[^/]#', method='GET')
 def static(file):
-    global disable_static
     global static_folder
-    if not disable_static:
-        return static_file(file, root=static_folder)
+    return static_file(file, root=static_folder)
 
 def usage():
     print "Usage: remotestick-server [OPTION] ..."
@@ -379,7 +374,6 @@ def main():
     global password
     global reqauth
     global static
-    global disable_static
 
     for o, a in opts:
         if o in ("-h", "--host"):
@@ -394,8 +388,6 @@ def main():
             library = a
         elif o in ("-f", "--static"):
             static_folder = a
-        elif o in ("-d", "--disable-static"):
-            disable_static=True
         elif o in ("-V", "--version"):
             version()
             exit()
