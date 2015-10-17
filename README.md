@@ -16,16 +16,20 @@ Either:
 
  * install TelldusCenter from
  [http://download.telldus.se/TellStick/Software/TelldusCenter](http://download.telldus.se/TellStick/Software/TelldusCenter)
- (which will give you the telldus-core library as well) or 
+ (which will give you the telldus-core library as well) or
  * compile/install telldus-core manually. telldus-core is found here
  [http://download.telldus.se/TellStick/Software/telldus-core/](http://download.telldus.se/TellStick/Software/telldus-core/)
 
+## Modifications
+  * This version works only on Linux
+  * REST responses are JSON
+  * Static resources are served from _/_ instead of _/s/*_
+  * Disabling of static resources is removed
+
 ## Getting it
 
- * A stable version of RemoteStick Server is found here
+ * A stable version of the *original* RemoteStick Server is found here
  http://github.com/pakerfeldt/remotestick/downloads (recommended).
- * A bleeding edge version of RemoteStick Server can be grabbed from the github
- repository remotestick.
 
 ## Using it
 The -? flag will give you help about available command line arguments:
@@ -49,24 +53,3 @@ Depending on where the telldus-core library is installed on your system you may
 have to define the environment variable LD_LIBRARY_PATH to include the directory
 where telldus-core is located.
     export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/opt/telldus/bin
-
-### Windows
-If TelldusCenter is installed RemoteStick server will have no problem locating
-the library. Although you might get an error saying ftdxx library is not found.
-In such cases add the Telldus folder to the PATH environment variable.
-    set PATH=%PATH%;"C:\Program files\Telldus" 
-or try running RemoteStick server using Telldus folder as working directory
-(i.e. stand in that directory when starting RemoteStick server).
-
-### Mac OS X
-The current version of TelldusCenter for Mac OS X, 2.0.2, does only come with 32
-bit support meaning that it will not work (out of the box) if you got a 64 bit
-version of Python (which you do if you're running a 64 bit version of Mac OS X,
-i.e. Snow Leopard). The error you might get indicating this is:
-    OSError: dlopen(/Library/Frameworks/TelldusCore.framework/TelldusCore, 6): no suitable image found.
-    Did find:/Library/Frameworks/TelldusCore.framework/TelldusCore: mach-o, but wrong architecture
-You have two options. Run python in 32 bit mode (recommended):
-    arch -arch i386 python2.6 ./remotestick-server.py ...
-OR you could also re-compile a 64 bit version of TelldusCore. Although very much
-feasable it is complicated. For instructions, see:
-http://www.whyro.org/2010/02/14/java-interface-to-tellstick-in-snow-leopard/
