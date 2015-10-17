@@ -130,7 +130,7 @@ def read_device(identity):
     if methods & TELLSTICK_TOGGLE:
         element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TOGGLE) + "', 'name': 'TELLSTICK_TOGGLE'}"
     if methods & TELLSTICK_TURNOFF:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNOFF) "', 'name': 'TELLSTICK_TURNOFF'}"
+        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNOFF) + "', 'name': 'TELLSTICK_TURNOFF'}"
     if methods & TELLSTICK_TURNON:
         element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNON) + "', 'name': 'TELLSTICK_TURNON'}"
     if methods & TELLSTICK_DIM:
@@ -149,6 +149,11 @@ def set_headers():
     response.set_content_type('application/json; charset=utf8')
     response.headers.append("X-API-VERSION", str(API_VERSION))
     response.headers.append("X-VERSION", VERSION)
+
+@route('/health', method='GET')
+def health():
+    set_headers()
+    return "{'health': 'OK'}"
 
 @route('/devices', method='GET')
 def devices():
@@ -244,7 +249,7 @@ def change_device(id):
         return retval
     except ValueError:
         return err(400, request_str, 210)
-    return ""
+    return "{'status': 'OK'}"
 
 @route('/devices/:id/on', method='GET')
 def turnon_device(id):
