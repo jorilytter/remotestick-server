@@ -87,7 +87,7 @@ def err(responsecode, request, code, code_msg=None):
     if code_msg == None:
         code_msg = errmsg(code)
 
-    return "{'request': '" + request + "', 'error': '" + code_msg + "'}"
+    return "{\"request\": \"" + request + "\", \"error\": \"" + code_msg + "\"}"
 
 def authenticate(auth):
     global username, password
@@ -107,35 +107,35 @@ def read_device(identity):
     methods = libtelldus.tdMethods(identity, ALL_METHODS)
     lastValue = libtelldus.tdLastSentValue(identity)
 
-    element = """{'device':
-            {'id': '""" + str(identity) + """'},
-            {'name': '""" + name + """'},
-            {'protocol': '""" + protocol + """'},
-            {'model': ''""" + model + """'},"""
+    element = ("{\"device\":"
+            "{\"id\": \"" + str(identity) + "},"
+            "{\"name\": \"" + name + "\"},"
+            "{\"protocol\": \"" + protocol + "\"},"
+            "{\"model\": \"" + model + "\"},")
 
     if lastcmd == 1:
-        element += "{'lastcmd': 'ON'},"
+        element += "{\"lastcmd\": \"ON\"},"
     else:
-        element += "{'lastcmd': 'OFF'}"
+        element += "{\"lastcmd\": \"OFF\"}"
     if lastValue != None and lastValue != "":
         try:
             lastValueConverted = int(lastValue)
-            element += ",{'lastvalue': '" + str(lastValueConverted) + "'}"
+            element += ",{\"lastvalue\": \"" + str(lastValueConverted) + "\"}"
         except Exception, e:
             pass
 
     if methods & TELLSTICK_BELL:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_BELL) + "', 'name': 'TELLSTICK_BELL'}"
+        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_BELL) + "\", \"name\": \"TELLSTICK_BELL\"}"
     if methods & TELLSTICK_TOGGLE:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TOGGLE) + "', 'name': 'TELLSTICK_TOGGLE'}"
+        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TOGGLE) + "\", \"name\": \"TELLSTICK_TOGGLE\"}"
     if methods & TELLSTICK_TURNOFF:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNOFF) + "', 'name': 'TELLSTICK_TURNOFF'}"
+        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TURNOFF) + "\", \"name\": \"TELLSTICK_TURNOFF\"}"
     if methods & TELLSTICK_TURNON:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_TURNON) + "', 'name': 'TELLSTICK_TURNON'}"
+        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TURNON) + "\", \"name\": \"TELLSTICK_TURNON\"}"
     if methods & TELLSTICK_DIM:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_DIM) + "', 'name': 'TELLSTICK_DIM'}"
+        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_DIM) + "\", \"name\": \"TELLSTICK_DIM\"}"
     if methods & TELLSTICK_LEARN:
-        element += ",{'supportedMethod': {'id' : '" + str(TELLSTICK_LEARN) + "', 'name': 'TELLSTICK_LEARN'}"
+        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_LEARN) + "\", \"name\": \"TELLSTICK_LEARN\"}"
     element += "}"
     return element
 
@@ -145,47 +145,47 @@ def pre_check():
     return True, None, None
 
 def set_headers():
-    response.set_content_type('application/json; charset=utf8')
+    response.set_content_type("application/json; charset=utf8")
     response.headers.append("X-API-VERSION", str(API_VERSION))
     response.headers.append("X-VERSION", VERSION)
 
-@route('/health', method='GET')
+@route("/health", method="GET")
 def health():
     set_headers()
-    return "{'health': 'OK'}"
+    return "{\"health\": \"OK\"}"
 
-@route('/devices', method='GET')
+@route("/devices", method="GET")
 def devices():
     set_headers()
-    result = "{'devices': ["
+    result = "{\"devices\": ["
     numDevices = libtelldus.tdGetNumberOfDevices()
     for i in range(numDevices):
         result += read_device(libtelldus.tdGetDeviceId(i))
     result += "]}"
     return result
 
-@route('/devices', method='POST')
+@route("/devices", method="POST")
 def new_device():
-    request_str = 'POST /devices'
+    request_str = "POST /devices"
     set_headers()
 
-    name = request.POST.get('name', '').strip()
+    name = request.POST.get("name", "").strip()
     if not name:
         return err(400, request_str, 201)
 
-    model = request.POST.get('model', '')
+    model = request.POST.get("model", "")
     if not model:
         return err(400, request_str, 202)
 
-    protocol = request.POST.get('protocol', '')
+    protocol = request.POST.get("protocol", "")
     if not protocol:
         return err(400, request_str, 203)
 
-    rawParams = request.POST.get('parameters', '')
+    rawParams = request.POST.get("parameters", "")
     parameters = []
     if rawParams != None:
         for param in rawParams.split():
-            keyval = param.split('=')
+            keyval = param.split("=")
             if len(keyval) != 2:
                 return err(400, request_str, 210)
             else:
@@ -199,9 +199,9 @@ def new_device():
     retval = read_device(identity)
     return retval
 
-@route('/devices/:id', method='GET')
+@route("/devices/:id", method="GET")
 def get_device(id):
-    request_str = 'GET /devices/' + id
+    request_str = "GET /devices/" + id
     set_headers()
 
     try:
@@ -211,9 +211,9 @@ def get_device(id):
         return err(400, request_str, 210)
 
 
-@route('/devices/:id', method='DELETE')
+@route("/devices/:id", method="DELETE")
 def delete_device(id):
-    request_str = 'DELETE /devices/' + id
+    request_str = "DELETE /devices/" + id
     set_headers()
 
     try:
@@ -222,18 +222,18 @@ def delete_device(id):
         return err(400, request_str, 210)
 
     if retval == 1:
-        return "{'status': 'OK'}"
+        return "{\"status\": \"OK\"}"
     else:
         return err(400, request_str, 211)
 
-@route('/devices/:id', method='PUT')
+@route("/devices/:id", method="PUT")
 def change_device(id):
-    request_str = 'PUT /devices/' + id
+    request_str = "PUT /devices/" + id
     set_headers()
 
-    name = request.POST.get('name', '').strip()
-    protocol = request.POST.get('protocol', '').strip()
-    model = request.POST.get('model', '').strip()
+    name = request.POST.get("name", "").strip()
+    protocol = request.POST.get("protocol", "").strip()
+    model = request.POST.get("model", "").strip()
     if name:
         libtelldus.tdSetName(int(id), name)
 
@@ -248,11 +248,11 @@ def change_device(id):
         return retval
     except ValueError:
         return err(400, request_str, 210)
-    return "{'status': 'OK'}"
+    return "{\"status\": \"OK\"}"
 
-@route('/devices/:id/on', method='GET')
+@route("/devices/:id/on", method="GET")
 def turnon_device(id):
-    request_str = 'GET /devices/' + id + "/on"
+    request_str = "GET /devices/" + id + "/on"
     set_headers()
 
     try:
@@ -263,15 +263,15 @@ def turnon_device(id):
     if libtelldus.tdMethods(identity, TELLSTICK_TURNON) & TELLSTICK_TURNON:
         retval = libtelldus.tdTurnOn(identity)
         if retval == 0:
-            return "{'status': 'OK'}"
+            return "{\"status\": \"OK\"}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
         return err(400, request_str, 220)
 
-@route('/devices/:id/off', method='GET')
+@route("/devices/:id/off", method="GET")
 def turnoff_device(id):
-    request_str = 'GET /devices/' + id + "/off"
+    request_str = "GET /devices/" + id + "/off"
     set_headers()
 
     try:
@@ -282,15 +282,15 @@ def turnoff_device(id):
     if libtelldus.tdMethods(identity, TELLSTICK_TURNOFF) & TELLSTICK_TURNOFF:
         retval = libtelldus.tdTurnOff(identity)
         if retval == 0:
-            return "{'status': 'OK'}"
+            return "{\"status\": \"OK\"}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
         return err(400, request_str, 220)
 
-@route('/devices/:id/dim/:level', method='GET')
+@route("/devices/:id/dim/:level", method="GET")
 def dim_device(id, level):
-    request_str = 'GET /devices/' + id + "/dim/" + level
+    request_str = "GET /devices/" + id + "/dim/" + level
     set_headers()
 
     try:
@@ -303,15 +303,15 @@ def dim_device(id, level):
     if libtelldus.tdMethods(identity, TELLSTICK_DIM) & TELLSTICK_DIM:
         retval = libtelldus.tdDim(identity, dimlevel)
         if retval == 0:
-            return "{'status': 'OK'}"
+            return "{\"status\": \"OK\"}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
         return err(400, request_str, 220)
 
-@route('/devices/:id/learn', method='GET')
+@route("/devices/:id/learn", method="GET")
 def learn_device(id):
-    request_str = 'GET /devices/' + id + "/learn"
+    request_str = "GET /devices/" + id + "/learn"
     set_headers()
 
     try:
@@ -322,19 +322,19 @@ def learn_device(id):
     if libtelldus.tdMethods(identity, TELLSTICK_LEARN) & TELLSTICK_LEARN:
         retval = libtelldus.tdLearn(identity)
         if retval == 0:
-            return "{'status': 'OK'}"
+            return "{\"status\": \"OK\"}"
         else:
             return err(502, request_str, 300, libtelldus.tdGetErrorString(retval))
     else:
         return err(400, request_str, 220)
 
-@route('/', method='GET')
-@route('', method='GET')
+@route("/", method="GET")
+@route("", method="GET")
 def static_default():
     global static_folder
-    return static_file('index.html', root=static_folder)
+    return static_file("index.html", root=static_folder)
 
-@route('/:file#.*[^/]#', method='GET')
+@route("/:file#.*[^/]#", method="GET")
 def static(file):
     global static_folder
     return static_file(file, root=static_folder)
@@ -391,7 +391,7 @@ def main():
         elif o in ("-V", "--version"):
             version()
             exit()
-        elif o == '-?':
+        elif o == "-?":
             usage()
             exit()
         else:
