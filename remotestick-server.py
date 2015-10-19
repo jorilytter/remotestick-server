@@ -107,7 +107,7 @@ def read_device(identity):
     methods = libtelldus.tdMethods(identity, ALL_METHODS)
     lastValue = libtelldus.tdLastSentValue(identity)
 
-    element = ("{\"device\":"
+    element = ("{\"
             "{\"id\": \"" + str(identity) + "},"
             "{\"name\": \"" + name + "\"},"
             "{\"protocol\": \"" + protocol + "\"},"
@@ -157,7 +157,7 @@ def health():
 @route("/devices", method="GET")
 def devices():
     set_headers()
-    result = "{\"devices\": ["
+    result = "{["
     numDevices = libtelldus.tdGetNumberOfDevices()
     for i in range(numDevices):
         result += read_device(libtelldus.tdGetDeviceId(i))
