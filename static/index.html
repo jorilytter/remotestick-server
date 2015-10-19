@@ -1,6 +1,9 @@
+<meta charset="UTF-8"> 
 <html>
 <head>
   <title>Outlets Control</title>
+  <link href="styles/font-awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet"></link>
+  <link href="styles/remote.css" rel="stylesheet"></link>
 </head>
 <body>
   <script src="js/remote.js" type="text/javascript"></script>
@@ -9,8 +12,17 @@
   <p>
     This will contain outlets control via tellstick duo
   </p>
-  <h2>Service status</h2>
-  <p id="health-status">
-  </p>
+
+  <div id="health-status">
+    <h2>Service status</h2>
+    <i id="health-status-icon" class="fa fa-heart-o"></i>
+  </div>
+
+  <div id="outlets">
+      <h2>Outlets</h2>
+      <div id="outlets-info">
+      </div>
+  </div>
+
 </body>
 </html>
