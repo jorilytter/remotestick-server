@@ -1,22 +1,79 @@
+h1 {
+  font-size: 16pt;
+}
+
 body {
+  padding: 0 5px 0 5px;
   margin-left: auto;
   margin-right: auto;
   max-width: 800px;
-  min-width: 500px;
+  min-width: 300px;
+  background-color: #2B2B2B;
+  color: #D5D5D5;
+  font-family: helvetica;
 }
 
-.red {
-  color: #B8071C;
+a {
+  color: #D5D5D5;
 }
 
 .gray {
-  color: gray;
+  color: #8F8F8F;
 }
 
-.white {
-  color: white;
+.yellow {
+  color: #FFD700;
 }
 
-#health-status-icon {
-  font-size: 20pt;
+.device {
+  background-color: #5F5F5F;
+  margin: 0 5px 10px 5px;
+  height: 50px;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+.device-name {
+  width: 44%;
+  float: left;
+  text-align: left;
+  margin-top: 10px;
+  padding-left: 3%;
+}
+
+.device-details {
+  width: 44%;
+  float: right;
+  text-align: right;
+  font-size: 34pt;
+  padding-right: 3%;
+}
+
+#main-container {
+  background-color: #555555;
+  border: #BBBBBB 0px solid;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0px 8px 10px #444444;
+}
+
+#header {
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#outlets-info:first-child {
+  margin-top: 10px;
+}
+
+#outlets {
+  border: 0px #C0C0C0 solid;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0px 5px 4px #888888;
+  margin: 10px;
+  background-color: #444444;
 }

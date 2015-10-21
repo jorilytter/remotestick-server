@@ -17,51 +17,97 @@ var devices = [{
 }]
 
 function deviceInfo(device) {
+
   var container = document.getElementById('outlets-info')
-  var textC = document.createElement('p')
-  var text = document.createTextNode("id: " + device.id + "; name: " + device.name)
-  textC.appendChild(text)
-  container.appendChild(textC)
+
+  var link = document.createElement('a')
+  link.setAttribute('href', '#')
+  if (device.lastCommand.toLowerCase() === 'off') {
+    link.setAttribute('onclick', 'turnOn(' + device.id + ');return false;')
+  } else {
+    link.setAttribute('onclick', 'turnOff(' + device.id + ');return false;')
+  }
+
+  var deviceContainer = document.createElement('div')
+  addClass(deviceContainer, 'device')
+
+  var deviceNameSection = document.createElement('div')
+  var deviceName = document.createTextNode(device.name)
+  deviceNameSection.appendChild(deviceName)
+  addClass(deviceNameSection, 'device-name')
+
+  var deviceIconContainer = document.createElement('div')
+  var icon = lightBulbIcon(device)
+  deviceIconContainer.appendChild(icon)
+  addClass(deviceIconContainer, 'device-details')
+
+  deviceContainer.appendChild(deviceNameSection)
+  deviceContainer.appendChild(deviceIconContainer)
+
+  link.appendChild(deviceContainer)
+  container.appendChild(link)
+}
+
+function lightBulbIcon(device) {
+
+  var icon = document.createElement('i')
+  addClass(icon, 'fa')
+  addClass(icon, 'fa-lightbulb-o')
+
+  if (device.lastCommand.toLowerCase() === 'off') {
+    addClass(icon, 'gray')
+  } else {
+    addClass(icon, 'yellow')
+  }
+
+  return icon
 }
 
 function listDevices() {
+
+  var container = document.getElementById('outlets-info')
+  while (container.hasChildNodes()) {
+    container.removeChild(container.firstChild);
+  }
+
   devices.map(deviceInfo)
 }
 
-function health() {
+function turnOn(deviceId) {
+  toggleOutlet('/devices/' + deviceId + '/on')
+}
+
+function turnOff(deviceId) {
+  toggleOutlet('/devices/' + deviceId + '/off')
+  listDevices()
+}
+
+function toggleOutlet(requestUrl) {
   var request = new XMLHttpRequest()
-  request.open('GET', '/health', true)
+  request.open('GET', requestUrl, true)
 
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
       var data = JSON.parse(request.responseText)
-      var statusText = document.createTextNode(data.health)
-      var icon = document.getElementById('health-status-icon')
-
-      if (data.health.toLowerCase() === 'ok') {
-        removeClass(icon, 'fa-heart-o')
-        removeClass(icon, 'gray')
-        addClass(icon, 'fa-heart')
-        addClass(icon, 'red')
+      if (data.status.toLowerCase() === 'ok') {
+        listDevices()
       } else {
-        removeClass(icon, 'fa-heart')
-        removeClass(icon, 'red')
-        addClass(icon, 'fa-heart-o')
-        addClass(icon, 'gray')
+        console.error('Error while turning outlet on', request.responseText)
       }
     } else {
-      console.err('Error received from REST API', request.status, request.responseText)
+      console.error('Error received from REST API', request.status, request.responseText)
     }
-  };
+  }
 
   request.onerror = function (error) {
-    console.err('Error: ', error)
+    console.error('Error: ', error)
   };
 
   request.send()
 }
 
 function addClass(element, className) {
+
   if (element.classList) {
     element.classList.add(className)
   } else {
@@ -70,6 +116,7 @@ function addClass(element, className) {
 }
 
 function removeClass(element, className) {
+
   if (element.classList) {
     element.classList.remove(className)
   } else {
@@ -77,9 +124,9 @@ function removeClass(element, className) {
   }
 }
 
-document.onreadystatechange = function(){
+document.onreadystatechange = function() {
+
   if (document.readyState === 'complete') {
-    health()
     listDevices()
   }
 }
