@@ -83,15 +83,11 @@ function listDevices() {
 }
 
 function turnOn(deviceId) {
-
   toggleOutlet('/devices/' + deviceId + '/on')
-  listDevices()
 }
 
 function turnOff(deviceId) {
-
   toggleOutlet('/devices/' + deviceId + '/off')
-  listDevices()
 }
 
 function toggleOutlet(requestUrl) {
