@@ -392,10 +392,10 @@ def main():
         else:
             assert False, "unhandled option " + o
 
-#    lib, libname = loadlibrary(library)
-#    if lib == None:
-#        print "Error: Cannot find library " + libname
-#        exit(3)
+    lib, libname = loadlibrary(library)
+    if lib == None:
+        print "Error: Cannot find library " + libname
+        exit(3)
 
     if username == None or password == None:
         print "Warning: No authentication required. Please consider setting --username and --password."
