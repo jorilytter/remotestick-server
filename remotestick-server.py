@@ -149,11 +149,6 @@ def set_headers():
     response.headers.append("X-API-VERSION", str(API_VERSION))
     response.headers.append("X-VERSION", VERSION)
 
-@route("/health", method="GET")
-def health():
-    set_headers()
-    return "{\"health\": \"OK\"}"
-
 @route("/devices", method="GET")
 def devices():
     set_headers()
