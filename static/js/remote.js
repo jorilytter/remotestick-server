@@ -1,21 +1,3 @@
-var devices = [{
-  id: "1",
-  name: "TV",
-  protocol: "foo",
-  model: "bar",
-  lastCommand: "ON",
-  lastValue: "tadaa",
-  supportedMethod: {id: "TELLSTICK_TURNOFF", name: "TELLSTICK_TURNOFF"}
-},{
-  id: "2",
-  name: "Työhuone",
-  protocol: "foo",
-  model: "bar",
-  lastCommand: "OFF",
-  lastValue: "tadaa",
-  supportedMethod: {id: "TELLSTICK_TURNON", name: "TELLSTICK_TURNON"}
-}]
-
 function deviceInfo(device) {
 
   var container = document.getElementById('outlets-info')
@@ -70,7 +52,17 @@ function listDevices() {
     container.removeChild(container.firstChild);
   }
 
-  devices.map(deviceInfo)
+  var request = new XMLHttpRequest()
+  request.open('GET', '/devices', true)
+
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var devices = JSON.parse(request.responseText)
+      devices.map(deviceInfo)
+    } else {
+      console.error('Error received from REST API', request.status, request.responseText)
+    }
+  }
 }
 
 function turnOn(deviceId) {
