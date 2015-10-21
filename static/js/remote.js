@@ -1,33 +1,50 @@
 function deviceInfo(device) {
 
   var container = document.getElementById('outlets-info')
-
-  var link = document.createElement('a')
-  link.setAttribute('href', '#')
-  if (device.lastCommand.toLowerCase() === 'off') {
-    link.setAttribute('onclick', 'turnOn(' + device.id + ');return false;')
-  } else {
-    link.setAttribute('onclick', 'turnOff(' + device.id + ');return false;')
-  }
+  var link = deviceLink(device)
+  var deviceNameSection = deviceName(device.name)
+  var deviceIconContainer = deviceIcon(device)
 
   var deviceContainer = document.createElement('div')
   addClass(deviceContainer, 'device')
+  deviceContainer.appendChild(deviceNameSection)
+  deviceContainer.appendChild(deviceIconContainer)
+  link.appendChild(deviceContainer)
+  container.appendChild(link)
+}
 
-  var deviceNameSection = document.createElement('div')
-  var deviceName = document.createTextNode(device.name)
-  deviceNameSection.appendChild(deviceName)
-  addClass(deviceNameSection, 'device-name')
+function deviceIcon(device) {
 
   var deviceIconContainer = document.createElement('div')
   var icon = lightBulbIcon(device)
   deviceIconContainer.appendChild(icon)
   addClass(deviceIconContainer, 'device-details')
 
-  deviceContainer.appendChild(deviceNameSection)
-  deviceContainer.appendChild(deviceIconContainer)
+  return deviceIconContainer
+}
 
-  link.appendChild(deviceContainer)
-  container.appendChild(link)
+function deviceName(name) {
+
+  var name = document.createElement('div')
+  var deviceName = document.createTextNode(name)
+  deviceNameSection.appendChild(deviceName)
+  addClass(deviceNameSection, 'device-name')
+
+  return name
+}
+
+function deviceLink(device) {
+
+  var link = document.createElement('a')
+  link.setAttribute('href', '#')
+
+  if (device.lastCommand.toLowerCase() === 'off') {
+    link.setAttribute('onclick', 'turnOn(' + device.id + ');return false;')
+  } else {
+    link.setAttribute('onclick', 'turnOff(' + device.id + ');return false;')
+  }
+
+  return link
 }
 
 function lightBulbIcon(device) {
@@ -66,15 +83,19 @@ function listDevices() {
 }
 
 function turnOn(deviceId) {
+
   toggleOutlet('/devices/' + deviceId + '/on')
+  listDevices()
 }
 
 function turnOff(deviceId) {
+
   toggleOutlet('/devices/' + deviceId + '/off')
   listDevices()
 }
 
 function toggleOutlet(requestUrl) {
+
   var request = new XMLHttpRequest()
   request.open('GET', requestUrl, true)
 
