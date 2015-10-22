@@ -108,34 +108,34 @@ def read_device(identity):
     lastValue = libtelldus.tdLastSentValue(identity)
 
     element = ("{"
-            "{\"id\": \"" + str(identity) + "},"
-            "{\"name\": \"" + name + "\"},"
-            "{\"protocol\": \"" + protocol + "\"},"
-            "{\"model\": \"" + model + "\"},")
+            "\"id\": \"" + str(identity) + ","
+            "\"name\": \"" + name + "\","
+            "\"protocol\": \"" + protocol + "\","
+            "\"model\": \"" + model + "\",")
 
     if lastcmd == 1:
-        element += "{\"lastcmd\": \"ON\"},"
+        element += "\"lastcmd\": \"ON\","
     else:
-        element += "{\"lastcmd\": \"OFF\"}"
+        element += "\"lastcmd\": \"OFF\""
     if lastValue != None and lastValue != "":
         try:
             lastValueConverted = int(lastValue)
-            element += ",{\"lastvalue\": \"" + str(lastValueConverted) + "\"}"
+            element += ",\"lastvalue\": \"" + str(lastValueConverted) + "\""
         except Exception, e:
             pass
 
     if methods & TELLSTICK_BELL:
-        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_BELL) + "\", \"name\": \"TELLSTICK_BELL\"}"
+        element += ",\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_BELL) + "\", \"name\": \"TELLSTICK_BELL\"}"
     if methods & TELLSTICK_TOGGLE:
-        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TOGGLE) + "\", \"name\": \"TELLSTICK_TOGGLE\"}"
+        element += ",\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TOGGLE) + "\", \"name\": \"TELLSTICK_TOGGLE\"}"
     if methods & TELLSTICK_TURNOFF:
-        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TURNOFF) + "\", \"name\": \"TELLSTICK_TURNOFF\"}"
+        element += ",\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TURNOFF) + "\", \"name\": \"TELLSTICK_TURNOFF\"}"
     if methods & TELLSTICK_TURNON:
-        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TURNON) + "\", \"name\": \"TELLSTICK_TURNON\"}"
+        element += ",\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_TURNON) + "\", \"name\": \"TELLSTICK_TURNON\"}"
     if methods & TELLSTICK_DIM:
-        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_DIM) + "\", \"name\": \"TELLSTICK_DIM\"}"
+        element += ",\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_DIM) + "\", \"name\": \"TELLSTICK_DIM\"}"
     if methods & TELLSTICK_LEARN:
-        element += ",{\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_LEARN) + "\", \"name\": \"TELLSTICK_LEARN\"}"
+        element += ",\"supportedMethod\": {\"id\": \"" + str(TELLSTICK_LEARN) + "\", \"name\": \"TELLSTICK_LEARN\"}"
     element += "}"
     return element
 
