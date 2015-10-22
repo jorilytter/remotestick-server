@@ -114,7 +114,7 @@ def read_device(identity):
             "\"model\": \"" + model + "\",")
 
     if lastcmd == 1:
-        element += "\"lastcmd\": \"ON\","
+        element += "\"lastcmd\": \"ON\""
     else:
         element += "\"lastcmd\": \"OFF\""
     if lastValue != None and lastValue != "":
