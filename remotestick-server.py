@@ -107,8 +107,8 @@ def read_device(identity):
     methods = libtelldus.tdMethods(identity, ALL_METHODS)
     lastValue = libtelldus.tdLastSentValue(identity)
 
-    element = ("\"device\": {"
-            "\"id\": \"" + str(identity) + ","
+    element = ("{"
+            "\"id\": \"" + str(identity) + "\","
             "\"name\": \"" + name + "\","
             "\"protocol\": \"" + protocol + "\","
             "\"model\": \"" + model + "\",")
@@ -126,17 +126,17 @@ def read_device(identity):
 
     element += ",\"supportedMethods\": ["
     if methods & TELLSTICK_BELL:
-        element +=  "\"method\": {\"id\": \"" + str(TELLSTICK_BELL) + "\", \"name\": \"TELLSTICK_BELL\"},"
+        element +=  "{\"id\": \"" + str(TELLSTICK_BELL) + "\", \"name\": \"TELLSTICK_BELL\"},"
     if methods & TELLSTICK_TOGGLE:
-        element += "\"method\": {\"id\": \"" + str(TELLSTICK_TOGGLE) + "\", \"name\": \"TELLSTICK_TOGGLE\"},"
+        element += "{\"id\": \"" + str(TELLSTICK_TOGGLE) + "\", \"name\": \"TELLSTICK_TOGGLE\"},"
     if methods & TELLSTICK_TURNOFF:
-        element += "\"method\": {\"id\": \"" + str(TELLSTICK_TURNOFF) + "\", \"name\": \"TELLSTICK_TURNOFF\"},"
+        element += "{\"id\": \"" + str(TELLSTICK_TURNOFF) + "\", \"name\": \"TELLSTICK_TURNOFF\"},"
     if methods & TELLSTICK_TURNON:
-        element += "\"method\": {\"id\": \"" + str(TELLSTICK_TURNON) + "\", \"name\": \"TELLSTICK_TURNON\"},"
+        element += "{\"id\": \"" + str(TELLSTICK_TURNON) + "\", \"name\": \"TELLSTICK_TURNON\"},"
     if methods & TELLSTICK_DIM:
-        element += "\"method\": {\"id\": \"" + str(TELLSTICK_DIM) + "\", \"name\": \"TELLSTICK_DIM\"},"
+        element += "{\"id\": \"" + str(TELLSTICK_DIM) + "\", \"name\": \"TELLSTICK_DIM\"},"
     if methods & TELLSTICK_LEARN:
-        element += "\"method\": {\"id\": \"" + str(TELLSTICK_LEARN) + "\", \"name\": \"TELLSTICK_LEARN\"},"
+        element += "{\"id\": \"" + str(TELLSTICK_LEARN) + "\", \"name\": \"TELLSTICK_LEARN\"},"
 
     element = element[:-1]
     element += "]},"
