@@ -155,7 +155,7 @@ def set_headers():
 @route("/devices", method="GET")
 def devices():
     set_headers()
-    result = "{["
+    result = "{\"devices\": ["
     numDevices = libtelldus.tdGetNumberOfDevices()
     for i in range(numDevices):
         result += read_device(libtelldus.tdGetDeviceId(i))
