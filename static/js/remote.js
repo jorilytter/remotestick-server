@@ -69,12 +69,12 @@ function listDevices() {
 
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
-      var devices = JSON.parse(request.responseText)
+      var response = JSON.parse(request.responseText)
       var container = document.getElementById('outlets-info')
       while (container.hasChildNodes()) {
         container.removeChild(container.firstChild);
       }
-      devices.map(deviceInfo)
+      response.devices.map(deviceInfo)
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
     }
