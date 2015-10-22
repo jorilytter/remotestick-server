@@ -80,6 +80,12 @@ function listDevices() {
       console.error('Error received from REST API', request.status, request.responseText)
     }
   }
+
+  request.onerror = function (error) {
+    console.error('Error: ', error)
+  };
+
+  request.send()
 }
 
 function turnOn(deviceId) {
