@@ -25,12 +25,12 @@ function deviceIcon(device) {
 
 function deviceName(name) {
 
-  var name = document.createElement('div')
+  var deviceNameSection = document.createElement('div')
   var deviceName = document.createTextNode(name)
   deviceNameSection.appendChild(deviceName)
   addClass(deviceNameSection, 'device-name')
 
-  return name
+  return deviceNameSection
 }
 
 function deviceLink(device) {
@@ -38,7 +38,7 @@ function deviceLink(device) {
   var link = document.createElement('a')
   link.setAttribute('href', '#')
 
-  if (device.lastCommand.toLowerCase() === 'off') {
+  if (device.lastcmd.toLowerCase() === 'off') {
     link.setAttribute('onclick', 'turnOn(' + device.id + ');return false;')
   } else {
     link.setAttribute('onclick', 'turnOff(' + device.id + ');return false;')
@@ -53,7 +53,7 @@ function lightBulbIcon(device) {
   addClass(icon, 'fa')
   addClass(icon, 'fa-lightbulb-o')
 
-  if (device.lastCommand.toLowerCase() === 'off') {
+  if (device.lastcmd.toLowerCase() === 'off') {
     addClass(icon, 'gray')
   } else {
     addClass(icon, 'yellow')
@@ -64,17 +64,16 @@ function lightBulbIcon(device) {
 
 function listDevices() {
 
-  var container = document.getElementById('outlets-info')
-  while (container.hasChildNodes()) {
-    container.removeChild(container.firstChild);
-  }
-
   var request = new XMLHttpRequest()
   request.open('GET', '/devices', true)
 
   request.onload = function () {
     if (request.status >= 200 && request.status < 400) {
       var devices = JSON.parse(request.responseText)
+      var container = document.getElementById('outlets-info')
+      while (container.hasChildNodes()) {
+        container.removeChild(container.firstChild);
+      }
       devices.map(deviceInfo)
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
