@@ -107,7 +107,7 @@ def read_device(identity):
     methods = libtelldus.tdMethods(identity, ALL_METHODS)
     lastValue = libtelldus.tdLastSentValue(identity)
 
-    element = ("{"
+    element = ("\"device\": {"
             "\"id\": \"" + str(identity) + ","
             "\"name\": \"" + name + "\","
             "\"protocol\": \"" + protocol + "\","
