@@ -79,7 +79,7 @@ function allOffButton(devices) {
   var container = document.getElementById('outlets-info')
   var link = document.createElement('a')
   link.setAttribute('href', '#')
-  link.setAttribute('onclick', 'allOff(' + deviceIds + ');return false;')
+  link.setAttribute('onclick', 'allOff(' + [deviceIds] + ');return false;')
 
   var allOffSection = document.createElement('div')
   var name = document.createTextNode('Turn all OFF')
