@@ -67,14 +67,19 @@ function deviceTurnedOn(device) {
   return device.lastcmd.toLowerCase() === 'on'
 }
 
+function getDeviceId(device) {
+  return device.id
+}
+
 function allOffButton(devices) {
 
   var anyDeviceTurnedOn = devices.filter(deviceTurnedOn).length > 0
+  var deviceIds = devices.map(getDeviceId)
 
   var container = document.getElementById('outlets-info')
   var link = document.createElement('a')
   link.setAttribute('href', '#')
-  link.setAttribute('onclick', 'allOff(' + devices + ');return false;')
+  link.setAttribute('onclick', 'allOff(' + deviceIds + ');return false;')
 
   var allOffSection = document.createElement('div')
   var name = document.createTextNode('Turn all OFF')
@@ -123,18 +128,16 @@ function listDevices() {
   request.send()
 }
 
-function allOff(devices) {
+function allOff(deviceIds) {
 
-  devices.map(function(device) {
-    var url = '/devices/' + device.id + '/off'
+  deviceIds.map(function(deviceId) {
+    var url = '/devices/' + deviceId + '/off'
     var request = new XMLHttpRequest()
     request.open('GET', url, true)
 
     if (request.status >= 200 && request.status < 400) {
       var data = JSON.parse(request.responseText)
-      if (data.status.toLowerCase() === 'ok') {
-        lightBulbIcon(device)
-      } else {
+      if (data.status.toLowerCase() !== 'ok') {
         console.error('Error while turning outlet off', request.responseText)
       }
     } else {
@@ -147,7 +150,7 @@ function allOff(devices) {
 
     request.send()
   })
-
+  listDevices()
 }
 
 function turnOn(deviceId) {
