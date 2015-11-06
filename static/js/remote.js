@@ -79,7 +79,7 @@ function allOffButton(devices) {
   var container = document.getElementById('outlets-info')
   var link = document.createElement('a')
   link.setAttribute('href', '#')
-  link.setAttribute('onclick', 'allOff(' + deviceIds + ');return false;')
+  link.setAttribute('onclick', 'allOff(' + deviceIds + ');listDevices();return false;')
 
   var allOffSection = document.createElement('div')
   var name = document.createTextNode('Turn all OFF')
@@ -128,21 +128,12 @@ function listDevices() {
   request.send()
 }
 
-function allOff(deviceIds) {
+function allOff(...deviceIds) {
 
   deviceIds.map(function(deviceId) {
     var url = '/devices/' + deviceId + '/off'
     var request = new XMLHttpRequest()
     request.open('GET', url, true)
-
-    if (request.status >= 200 && request.status < 400) {
-      var data = JSON.parse(request.responseText)
-      if (data.status.toLowerCase() !== 'ok') {
-        console.error('Error while turning outlet off', request.responseText)
-      }
-    } else {
-      console.error('Error received from REST API', request.status, request.responseText)
-    }
 
     request.onerror = function (error) {
       console.error('Error: ', error)
@@ -150,7 +141,6 @@ function allOff(deviceIds) {
 
     request.send()
   })
-  listDevices()
 }
 
 function turnOn(deviceId) {
