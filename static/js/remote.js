@@ -62,6 +62,41 @@ function lightBulbIcon(device) {
   return icon
 }
 
+
+function deviceTurnedOn(device) {
+  return device.lastcmd.toLowerCase() === 'on'
+}
+
+function allOffButton(devices) {
+
+  var anyDeviceTurnedOn = devices.filter(deviceTurnedOn).length > 0
+
+  var container = document.getElementById('outlets-info')
+  var link = document.createElement('a')
+  link.setAttribute('href', '#')
+  link.setAttribute('onclick', 'allOff(' + devices + ');return false;')
+
+  var allOffSection = document.createElement('div')
+  var name = document.createTextNode('Turn all OFF')
+  allOffSection.appendChild(name)
+  addClass(allOffSection, 'device-name')
+
+  var buttonContainer = document.createElement('div')
+  addClass(buttonContainer, 'device')
+  buttonContainer.appendChild(allOffSection)
+
+  link.appendChild(buttonContainer)
+  container.appendChild(link)
+
+  if (anyDeviceTurnedOn) {
+    removeClass(allOffSection, 'gray')
+    addClass(allOffSection, 'yellow')
+  } else {
+    removeClass(allOffSection, 'yellow')
+    addClass(allOffSection, 'gray')
+  }
+}
+
 function listDevices() {
 
   var request = new XMLHttpRequest()
@@ -75,6 +110,7 @@ function listDevices() {
         container.removeChild(container.firstChild);
       }
       response.devices.map(deviceInfo)
+      allOffButton(devices)
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
     }
@@ -85,6 +121,33 @@ function listDevices() {
   };
 
   request.send()
+}
+
+function allOff(devices) {
+
+  devices.map(function(device) {
+    var url = '/devices/' + device.id + '/off'
+    var request = new XMLHttpRequest()
+    request.open('GET', url, true)
+
+    if (request.status >= 200 && request.status < 400) {
+      var data = JSON.parse(request.responseText)
+      if (data.status.toLowerCase() === 'ok') {
+        lightBulbIcon(device)
+      } else {
+        console.error('Error while turning outlet off', request.responseText)
+      }
+    } else {
+      console.error('Error received from REST API', request.status, request.responseText)
+    }
+
+    request.onerror = function (error) {
+      console.error('Error: ', error)
+    };
+
+    request.send()
+  })
+
 }
 
 function turnOn(deviceId) {
