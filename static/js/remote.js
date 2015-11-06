@@ -110,7 +110,7 @@ function listDevices() {
         container.removeChild(container.firstChild);
       }
       response.devices.map(deviceInfo)
-      allOffButton(devices)
+      allOffButton(response.devices)
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
     }
