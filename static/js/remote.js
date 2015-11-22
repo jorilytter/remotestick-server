@@ -74,7 +74,7 @@ function getDeviceId(device) {
 function allOffButton(devices) {
 
   var anyDeviceTurnedOn = devices.filter(deviceTurnedOn).length > 0
-  var deviceIds = devices.map(getDeviceId)
+  var deviceIds = devices.filter(deviceTurnedOn).map(getDeviceId)
 
   var container = document.getElementById('outlets-info')
   var link = document.createElement('a')
