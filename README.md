@@ -5,9 +5,8 @@ RemoteStick server exposes the Tellstick
 (see [Telldus Homepage](http://www.telldus.se) ) interface through RESTful
 services. RemoteStick server uses the native library libtelldus-core to
 communicate with the Tellstick. It supports resource browsing and resource
-operations (like turning on/off a device). Responses are given in XML format
-(support for JSON format is planned). It aims to fully reflect the capabilities
-of the libtelldus-core.
+operations (like turning on/off a device). Responses are given in JSON format.
+It aims to fully reflect the capabilities of the libtelldus-core.
 
 ## Prerequisites
 telldus-core need be installed. telldus-core is an open-source library developed
@@ -29,7 +28,7 @@ Either:
 ## Getting it
 
  * A stable version of the *original* RemoteStick Server is found here
- http://github.com/pakerfeldt/remotestick/downloads (recommended).
+ http://github.com/pakerfeldt/remotestick-server/.
 
 ## Using it
 The -? flag will give you help about available command line arguments:
@@ -45,6 +44,9 @@ your-hostname:8422. Only Basic Authentication (HTTP) currently supported.
 You should at least set a username and password, requiring client
 authentication:
     remotestick-server.py --username MyUsername --password MyPassword
+
+Project root contains a file `etc.init.d.rstick` that can be used as a init script to start 
+the service but stopping the service doesn't work yet.
 
 ## Troubleshooting
 
