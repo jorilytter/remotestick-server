@@ -90,11 +90,12 @@ function allOffButton(devices) {
   var allOffSection = document.createElement('div')
   var name = document.createTextNode('All OFF')
   allOffSection.appendChild(name)
-  addClass(allOffSection, 'halfbutton')
   addClass(allOffSection, 'device-name')
 
   var buttonContainer = document.createElement('div')
   addClass(buttonContainer, 'device')
+  addClass(buttonContainer, 'halfbutton')
+  
   buttonContainer.appendChild(allOffSection)
 
   link.appendChild(buttonContainer)
@@ -121,11 +122,11 @@ function allOnButton(devices) {
   var allOnSection = document.createElement('div')
   var name = document.createTextNode('All ON')
   allOnSection.appendChild(name)
-  addClass(allOnSection, 'halfbutton')
   addClass(allOnSection, 'device-name')
 
   var buttonContainer = document.createElement('div')
   addClass(buttonContainer, 'device')
+  addClass(buttonContainer, 'halfbutton')
   buttonContainer.appendChild(allOnSection)
 
   link.appendChild(buttonContainer)
