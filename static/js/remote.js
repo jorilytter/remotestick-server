@@ -115,10 +115,10 @@ function allOnButton(devices) {
   link.setAttribute('href', '#')
   link.setAttribute('onclick', 'allOn([' + deviceIds + ']);return false;')
 
-  var allOffSection = document.createElement('div')
+  var allOnSection = document.createElement('div')
   var name = document.createTextNode('Turn all ON')
-  allOffSection.appendChild(name)
-  addClass(allOffSection, 'device-name')
+  allOnSection.appendChild(name)
+  addClass(allOnSection, 'device-name')
 
   var buttonContainer = document.createElement('div')
   addClass(buttonContainer, 'device')
@@ -128,11 +128,11 @@ function allOnButton(devices) {
   container.appendChild(link)
 
   if (anyDeviceTurnedOff) {
-    removeClass(allOffSection, 'gray')
-    addClass(allOffSection, 'yellow')
+    removeClass(allOnSection, 'gray')
+    addClass(allOnSection, 'yellow')
   } else {
-    removeClass(allOffSection, 'yellow')
-    addClass(allOffSection, 'gray')
+    removeClass(allOnSection, 'yellow')
+    addClass(allOnSection, 'gray')
   }	
 }
 
