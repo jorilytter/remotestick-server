@@ -102,6 +102,36 @@ function allOffButton(devices) {
   }
 }
 
+function allOnButton(devices) {
+	var anyDeviceTurnedOff = devices.filter(!deviceTurnedOn).length > 0
+	var deviceIds = devices.filter(!deviceTurnedOn).map(getDeviceId)
+	
+	var container = document.getElementById('outlets-info')
+  var link = document.createElement('a')
+  link.setAttribute('href', '#')
+  link.setAttribute('onclick', 'allOn([' + deviceIds + ']);return false;')
+
+  var allOffSection = document.createElement('div')
+  var name = document.createTextNode('Turn all ON')
+  allOffSection.appendChild(name)
+  addClass(allOffSection, 'device-name')
+
+  var buttonContainer = document.createElement('div')
+  addClass(buttonContainer, 'device')
+  buttonContainer.appendChild(allOnSection)
+
+  link.appendChild(buttonContainer)
+  container.appendChild(link)
+
+  if (anyDeviceTurnedOff) {
+    removeClass(allOffSection, 'gray')
+    addClass(allOffSection, 'yellow')
+  } else {
+    removeClass(allOffSection, 'yellow')
+    addClass(allOffSection, 'gray')
+  }	
+}
+
 function listDevices() {
 
   var request = new XMLHttpRequest()
@@ -115,6 +145,7 @@ function listDevices() {
         container.removeChild(container.firstChild);
       }
       response.devices.map(deviceInfo)
+	  allOnButton(response.devices)
       allOffButton(response.devices)
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
@@ -134,6 +165,13 @@ function allOff(deviceIds) {
     var url = '/devices/' + deviceId + '/off'
     toggleOutlet(url)
   })
+}
+
+function allOn(deviceIds) {
+	deviceIds.map(function(deviceId){
+		var url = '/devices/' + deviceId + '/on'
+		toggleOutlet(url)
+	}
 }
 
 function turnOn(deviceId) {
