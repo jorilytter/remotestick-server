@@ -171,7 +171,7 @@ function allOn(deviceIds) {
 	deviceIds.map(function(deviceId){
 		var url = '/devices/' + deviceId + '/on'
 		toggleOutlet(url)
-	}
+	})
 }
 
 function turnOn(deviceId) {
