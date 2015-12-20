@@ -1,3 +1,5 @@
+
+
 function deviceInfo(device) {
 
   var container = document.getElementById('outlets-info')
@@ -86,8 +88,9 @@ function allOffButton(devices) {
   link.setAttribute('onclick', 'allOff([' + deviceIds + ']);return false;')
 
   var allOffSection = document.createElement('div')
-  var name = document.createTextNode('Turn all OFF')
+  var name = document.createTextNode('All OFF')
   allOffSection.appendChild(name)
+  addClass(allOffSection, 'halfbutton')
   addClass(allOffSection, 'device-name')
 
   var buttonContainer = document.createElement('div')
@@ -116,8 +119,9 @@ function allOnButton(devices) {
   link.setAttribute('onclick', 'allOn([' + deviceIds + ']);return false;')
 
   var allOnSection = document.createElement('div')
-  var name = document.createTextNode('Turn all ON')
+  var name = document.createTextNode('All ON')
   allOnSection.appendChild(name)
+  addClass(allOnSection, 'halfbutton')
   addClass(allOnSection, 'device-name')
 
   var buttonContainer = document.createElement('div')
