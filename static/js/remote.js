@@ -67,6 +67,10 @@ function deviceTurnedOn(device) {
   return device.lastcmd.toLowerCase() === 'on'
 }
 
+function deviceTurnedOff(device) {
+  return device.lastcmd.toLowerCase() === 'off'
+}
+
 function getDeviceId(device) {
   return device.id
 }
@@ -103,8 +107,8 @@ function allOffButton(devices) {
 }
 
 function allOnButton(devices) {
-	var anyDeviceTurnedOff = devices.filter(!deviceTurnedOn).length > 0
-	var deviceIds = devices.filter(!deviceTurnedOn).map(getDeviceId)
+	var anyDeviceTurnedOff = devices.filter(deviceTurnedOff).length > 0
+	var deviceIds = devices.filter(deviceTurnedOff).map(getDeviceId)
 	
 	var container = document.getElementById('outlets-info')
   var link = document.createElement('a')
