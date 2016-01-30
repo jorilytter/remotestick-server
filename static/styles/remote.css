@@ -77,3 +77,27 @@ a {
   margin: 10px;
   background-color: #444444;
 }
+
+#sensors {
+  border: 0px #C0C0C0 solid;
+  border-radius: 10px;
+  padding: 10px;
+  box-shadow: 0px 5px 4px #888888;
+  margin: 10px;
+  background-color: #444444;
+  text-align: left;
+}
+
+.sensor {
+  background-color: #5F5F5F;
+  margin: 0 5px 10px 5px;
+  height: 25px;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12pt;
+  font-weight: bold;
+}
+
+.sensor:last-of-type {
+  margin-bottom: 0;
+}

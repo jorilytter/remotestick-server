@@ -1,3 +1,27 @@
+function sensorInfo(sensors) {
+
+  var container = document.getElementById('sensors-info')
+
+  var outdoorTemperatureSection = document.createElement('div')
+  var outdoorTemperatureContent = document.createTextNode('Ulkolämpötila: ' + sensors.outdoorTemperature + ' C')
+  outdoorTemperatureSection.appendChild(outdoorTemperatureContent)
+  addClass(outdoorTemperatureSection, 'sensor')
+
+  var indoorTemperatureSection = document.createElement('div')
+  var indoorTemperatureContent = document.createTextNode('Sisälämpötila: ' + sensors.indoorTemperature + ' C')
+  indoorTemperatureSection.appendChild(indoorTemperatureContent)
+  addClass(indoorTemperatureSection, 'sensor')
+
+  var indoorHumiditySection = document.createElement('div')
+  var indoorHumidityContent = document.createTextNode('Sisätilan kosteus: ' + sensors.indoorHumidity + '%')
+  indoorHumiditySection.appendChild(indoorHumidityContent)
+  addClass(indoorHumiditySection, 'sensor')
+
+  container.appendChild(outdoorTemperatureSection)
+  container.appendChild(indoorTemperatureSection)
+  container.appendChild(indoorHumiditySection)
+}
+
 function deviceInfo(device) {
 
   var container = document.getElementById('outlets-info')
@@ -123,7 +147,32 @@ function listDevices() {
 
   request.onerror = function (error) {
     console.error('Error: ', error)
-  };
+  }
+
+  request.send()
+}
+
+function listSensors() {
+
+  var request = new XMLHttpRequest()
+  request.open('GET', '/sensors', true)
+
+  request.onload = function () {
+    if (request.status >= 200 && request.status < 400) {
+      var response = JSON.parse(request.responseText)
+      var container = document.getElementById('sensors-info')
+      while (container.hasChildNodes()) {
+        container.removeChild(container.firstChild);
+      }
+      sensorInfo(response)
+    } else {
+      console.error('Error received from REST API', request.status, request.responseText)
+    }
+  }
+
+  request.onerror = function (error) {
+    console.error('Error: ', error)
+  }
 
   request.send()
 }
@@ -191,5 +240,6 @@ document.onreadystatechange = function() {
 
   if (document.readyState === 'complete') {
     listDevices()
+    listSensors()
   }
 }
