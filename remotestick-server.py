@@ -192,10 +192,10 @@ def sensors():
             print "Temperature: ", value.value, "C,"
 
             if (idvalue.value == sensorconf.outdoor):
-                result += "\"outdoorTemp\":"
+                result += "\"outdoorTemperature\":"
                 result += value.value
             if (idvalue.value == sensorconf.indoor):
-                result += "\"indoorTemp\":"
+                result += "\"indoorTemperature\":"
                 result += value.value
 
             result += ","
