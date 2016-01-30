@@ -2,24 +2,38 @@ function sensorInfo(sensors) {
 
   var container = document.getElementById('sensors-info')
 
-  var outdoorTemperatureSection = document.createElement('div')
-  var outdoorTemperatureContent = document.createTextNode('Ulkolämpötila: ' + sensors.outdoorTemperature + ' C')
-  outdoorTemperatureSection.appendChild(outdoorTemperatureContent)
-  addClass(outdoorTemperatureSection, 'sensor')
+  if (sensors.hasOwnProperty('outdoorTemperature')) {
+    container.appendChild(sensorSection(sensors.outdoorTemperature, 'Ulkolämpötila', ' \xB0C'))
+  }
 
-  var indoorTemperatureSection = document.createElement('div')
-  var indoorTemperatureContent = document.createTextNode('Sisälämpötila: ' + sensors.indoorTemperature + ' C')
-  indoorTemperatureSection.appendChild(indoorTemperatureContent)
-  addClass(indoorTemperatureSection, 'sensor')
+  if (sensors.hasOwnProperty('indoorTemperature')) {
+    container.appendChild(sensorSection(sensors.indoorTemperature, 'Sisälämpötila', ' \xB0C'))
+  }
 
-  var indoorHumiditySection = document.createElement('div')
-  var indoorHumidityContent = document.createTextNode('Sisätilan kosteus: ' + sensors.indoorHumidity + '%')
-  indoorHumiditySection.appendChild(indoorHumidityContent)
-  addClass(indoorHumiditySection, 'sensor')
+  if (sensors.hasOwnProperty('indoorHumidity')) {
+    container.appendChild(sensorSection(sensors.indoorHumidity, 'Sisätilan kosteus', '%'))
+  }
+}
 
-  container.appendChild(outdoorTemperatureSection)
-  container.appendChild(indoorTemperatureSection)
-  container.appendChild(indoorHumiditySection)
+function sensorSection(sensorValue, sensorName, postfix) {
+
+  var section = document.createElement('div')
+
+  var nameSection = document.createElement('div')
+  var name = document.createTextNode(sensorName)
+  nameSection.appendChild(name);
+
+  var valueSection = document.createElement('div')
+  var value = document.createTextNode(sensorValue + postfix)
+  valueSection.appendChild(value);
+
+  section.appendChild(nameSection)
+  section.appendChild(valueSection)
+  addClass(section, 'sensor')
+  addClass(nameSection, 'sensor-name')
+  addClass(valueSection, 'sensor-value')
+
+  return section
 }
 
 function deviceInfo(device) {
