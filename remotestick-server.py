@@ -26,9 +26,10 @@ from getopt import getopt, GetoptError
 from sys import argv, exit, platform
 from base64 import b64encode
 import time
+import sensorconf
 
-VERSION = "0.5.0"
-API_VERSION = 2
+VERSION = "0.6.0"
+API_VERSION = 3
 
 #Device methods
 TELLSTICK_TURNON = 1
@@ -38,6 +39,8 @@ TELLSTICK_TOGGLE = 8
 TELLSTICK_DIM = 16
 TELLSTICK_LEARN = 32
 ALL_METHODS = TELLSTICK_TURNON | TELLSTICK_TURNOFF | TELLSTICK_BELL | TELLSTICK_TOGGLE | TELLSTICK_DIM | TELLSTICK_LEARN
+TELLSTICK_TEMPERATURE = 1
+TELLSTICK_HUMIDITY = 2
 
 reqauth = True
 username = None
@@ -161,6 +164,21 @@ def devices():
         result += read_device(libtelldus.tdGetDeviceId(i))
     result = result[:-1]
     result += "]}"
+
+    while(libtelldus.tdSensor(protocol, protocollength, model, modellength, byref(idvalue), byref(dataTypes)) == 0):
+      if (idvalue.value == sensorconf.outdoor or idvalue.value == sensorconf.indoor):
+        print "Sensor: ", protocol.value, model.value, "id:", idvalue.value
+        value = create_string_buffer(valuelength)
+        timestampvalue = c_int()
+
+        if((dataTypes.value & TELLSTICK_TEMPERATURE) != 0):
+            success = libtelldus.tdSensorValue(protocol.value, model.value, idvalue.value, TELLSTICK_TEMPERATURE, value, valuelength, byref(timestampvalue))
+            print "Temperature: ", value.value, "C,"
+
+        if((dataTypes.value & TELLSTICK_HUMIDITY) != 0 and idvalue.value == sensorconf.indoor):
+            success = libtelldus.tdSensorValue(protocol.value, model.value, idvalue.value, TELLSTICK_HUMIDITY, value, valuelength, byref(timestampvalue))
+            print "Humidity: ", value.value, "%,"
+
     return result
 
 @route("/devices", method="POST")
