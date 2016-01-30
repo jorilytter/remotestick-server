@@ -164,6 +164,22 @@ def devices():
         result += read_device(libtelldus.tdGetDeviceId(i))
     result = result[:-1]
     result += "]}"
+    return result
+
+@route("/sensors", method ="GET")
+def sensors():
+
+    set_headers()
+    result = "{"
+
+    protocollength = 20
+    modellength = 20
+    valuelength = 20
+
+    protocol = create_string_buffer(protocollength)
+    model = create_string_buffer(modellength)
+    idvalue = c_int()
+    dataTypes = c_int()
 
     while(libtelldus.tdSensor(protocol, protocollength, model, modellength, byref(idvalue), byref(dataTypes)) == 0):
       if (idvalue.value == sensorconf.outdoor or idvalue.value == sensorconf.indoor):
@@ -175,10 +191,24 @@ def devices():
             success = libtelldus.tdSensorValue(protocol.value, model.value, idvalue.value, TELLSTICK_TEMPERATURE, value, valuelength, byref(timestampvalue))
             print "Temperature: ", value.value, "C,"
 
+            if (idvalue.value == sensorconf.outdoor):
+                result += "\"outdoorTemp\":"
+                result += value.value
+            if (idvalue.value == sensorconf.indoor):
+                result += "\"indoorTemp\":"
+                result += value.value
+
+            result += ","
+
         if((dataTypes.value & TELLSTICK_HUMIDITY) != 0 and idvalue.value == sensorconf.indoor):
             success = libtelldus.tdSensorValue(protocol.value, model.value, idvalue.value, TELLSTICK_HUMIDITY, value, valuelength, byref(timestampvalue))
             print "Humidity: ", value.value, "%,"
+            result += "\"indoorHumidity\":"
+            result += value.value
+            result += ","
 
+    result = result[:-1]
+    result += "}"
     return result
 
 @route("/devices", method="POST")
