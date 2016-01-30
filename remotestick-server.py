@@ -166,6 +166,7 @@ def devices():
     result += "]}"
     return result
 
+# Sensor reading example taken from https://github.com/whale521/telldus_test/blob/95f93cd6d316a910c5d4d2d518f772e43b7caa20/examples/python/sensors/sensorspoll.py
 @route("/sensors", method ="GET")
 def sensors():
 
