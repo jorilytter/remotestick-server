@@ -140,6 +140,38 @@ function allOffButton(devices) {
   }
 }
 
+function allOnButton(devices) {
+
+  var deviceIds = devices.map(getDeviceId)
+
+  var container = document.getElementById('outlets-info')
+  var link = document.createElement('a')
+  link.setAttribute('href', '#')
+  link.setAttribute('onclick', 'allOn([' + deviceIds + ']);return false;')
+
+  var allOnSection = document.createElement('div')
+  var name = document.createTextNode('Turn all ON')
+  allOnSection.appendChild(name)
+  addClass(allOnSection, 'device-name')
+
+  var buttonContainer = document.createElement('div')
+  addClass(buttonContainer, 'device')
+  buttonContainer.appendChild(allOnSection)
+
+  link.appendChild(buttonContainer)
+  container.appendChild(link)
+
+  var anyDeviceTurnedOff = devices.filter(deviceTurnedOn).length < devices.length
+
+  if (anyDeviceTurnedOff) {
+    removeClass(allOnSection, 'gray')
+    addClass(allOnSection, 'yellow')
+  } else {
+    removeClass(allOnSection, 'yellow')
+    addClass(allOnSection, 'gray')
+  }
+}
+
 function listDevices() {
 
   var request = new XMLHttpRequest()
@@ -154,6 +186,7 @@ function listDevices() {
       }
       response.devices.map(deviceInfo)
       allOffButton(response.devices)
+      allOnButton(response.devices)
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
     }
@@ -192,23 +225,28 @@ function listSensors() {
 }
 
 function allOff(deviceIds) {
-
   deviceIds.map(function(deviceId) {
-    var url = '/devices/' + deviceId + '/off'
-    toggleOutlet(url)
+    turnOff(deviceId)
+  })
+}
+
+function allOn(deviceIds) {
+  deviceIds.map(function(deviceId) {
+    turnOn(deviceId)
   })
 }
 
 function turnOn(deviceId) {
-  toggleOutlet('/devices/' + deviceId + '/on')
+  toggleOutlet('/devices/' + deviceId + '/on', 0)
 }
 
 function turnOff(deviceId) {
-  toggleOutlet('/devices/' + deviceId + '/off')
+  toggleOutlet('/devices/' + deviceId + '/off', 0)
 }
 
-function toggleOutlet(requestUrl) {
+function toggleOutlet(requestUrl, retryCount) {
 
+  var maxRetries = 5
   var request = new XMLHttpRequest()
   request.open('GET', requestUrl, true)
 
@@ -218,7 +256,10 @@ function toggleOutlet(requestUrl) {
       if (data.status.toLowerCase() === 'ok') {
         listDevices()
       } else {
-        console.error('Error while turning outlet on', request.responseText)
+        console.error('Error while turning outlet on or off. Try ' + retryCount + '/' + maxRetries + '.', request.responseText)
+        if (retryCount < maxRetries) {
+          toggleOutlet(requestUrl, retryCount++)
+        }
       }
     } else {
       console.error('Error received from REST API', request.status, request.responseText)
@@ -255,5 +296,9 @@ document.onreadystatechange = function() {
   if (document.readyState === 'complete') {
     listDevices()
     listSensors()
+    setInterval(function () {
+      listDevices()
+      listSensors()
+    }, 30000)
   }
 }
