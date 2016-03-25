@@ -196,8 +196,10 @@ def sensors():
                 result += "\"outdoorTemperature\":"
                 result += value.value
             if (idvalue.value == sensorconf.indoor):
-                result += "\"indoorTemperature\":"
-                result += value.value
+                if (model.value == "temperaturehumidity"):
+                    print "model -> ", model.value
+                    result += "\"indoorTemperature\":"
+                    result += value.value
 
             result += ","
 
@@ -208,7 +210,7 @@ def sensors():
             result += value.value
             result += ","
 
-    result = result[:-1]
+    result = result[:-2]
     result += "}"
     return result
 
