@@ -210,7 +210,7 @@ def sensors():
             result += value.value
             result += ","
 
-    result = result[:-2]
+    result = result[:-1]
     result += "}"
     return result
 
