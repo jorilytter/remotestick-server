@@ -171,6 +171,11 @@ def devices():
 def sensors():
 
     set_headers()
+
+    if not sensorconf.enabled:
+      response.status = 404
+      return "Sensors disabled"
+
     result = "{"
 
     protocollength = 20
@@ -184,20 +189,20 @@ def sensors():
 
     while(libtelldus.tdSensor(protocol, protocollength, model, modellength, byref(idvalue), byref(dataTypes)) == 0):
       if (idvalue.value == sensorconf.outdoor or idvalue.value == sensorconf.indoor):
-        print "Sensor: ", protocol.value, model.value, "id:", idvalue.value
+        #print "Sensor: ", protocol.value, model.value, "id:", idvalue.value
         value = create_string_buffer(valuelength)
         timestampvalue = c_int()
 
         if((dataTypes.value & TELLSTICK_TEMPERATURE) != 0):
             success = libtelldus.tdSensorValue(protocol.value, model.value, idvalue.value, TELLSTICK_TEMPERATURE, value, valuelength, byref(timestampvalue))
-            print "Temperature: ", value.value, "C,"
+            #print "Temperature: ", value.value, "C,"
 
             if (idvalue.value == sensorconf.outdoor):
                 result += "\"outdoorTemperature\":"
                 result += value.value
             if (idvalue.value == sensorconf.indoor):
                 if (model.value == "temperaturehumidity"):
-                    print "model -> ", model.value
+                    #print "model -> ", model.value
                     result += "\"indoorTemperature\":"
                     result += value.value
 
@@ -205,7 +210,7 @@ def sensors():
 
         if((dataTypes.value & TELLSTICK_HUMIDITY) != 0 and idvalue.value == sensorconf.indoor):
             success = libtelldus.tdSensorValue(protocol.value, model.value, idvalue.value, TELLSTICK_HUMIDITY, value, valuelength, byref(timestampvalue))
-            print "Humidity: ", value.value, "%,"
+            #print "Humidity: ", value.value, "%,"
             result += "\"indoorHumidity\":"
             result += value.value
             result += ","

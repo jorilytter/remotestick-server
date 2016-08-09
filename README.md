@@ -24,6 +24,9 @@ Either:
   * REST responses are JSON
   * Static resources are served from _/_ instead of _/s/*_
   * Disabling of static resources is removed
+  * Support for sensors
+    * sensor support disabled by default
+    * Configurable via sensorconf.py
 
 ## Getting it
 
